@@ -237,16 +237,6 @@ The client automatically attempts to reconnect on disconnection:
 - 3-second delay between attempts
 - Console logging for debugging
 
-## Error Handling
-
-Errors are displayed in an error banner at the top of the application. Users can dismiss notifications by clicking the ✕ button.
-
-Common error scenarios:
-- Connection failures
-- WebSocket timeout (5 seconds per request)
-- Invalid tag selections
-- Subscription failures
-
 ## Browser Compatibility
 
 - Chrome/Chromium 90+
@@ -295,12 +285,3 @@ For issues or questions:
 2. Review browser console for errors
 3. Verify message formats in DevTools Network tab
 4. Check WebSocket connection status
-
-## Future Enhancements
-
-- [ ] Historical data visualization
-- [ ] Advanced tag filtering and search
-- [ ] Bulk operations (subscribe/unsubscribe multiple)
-- [ ] Tag value logging and export
-- [ ] Multi-language support
-- [ ] Dark mode theme
