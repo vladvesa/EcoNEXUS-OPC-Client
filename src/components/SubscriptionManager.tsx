@@ -5,18 +5,31 @@ import './SubscriptionManager.css';
 interface SubscriptionManagerProps {
   subscriptions: Subscription[];
   onUnsubscribe: (tagId: string) => void;
+  onUnsubscribeAll: () => void;
 }
 
 export const SubscriptionManager: React.FC<SubscriptionManagerProps> = ({
   subscriptions,
   onUnsubscribe,
+  onUnsubscribeAll,
 }) => {
   const activeSubscriptions = subscriptions.filter(s => s.status === 'active').length;
   const errorSubscriptions = subscriptions.filter(s => s.status === 'error').length;
 
   return (
     <div className="subscription-manager">
-      <h2>Active Subscriptions</h2>
+      <div className="subscriptions-header">
+        <h2>Active Subscriptions</h2>
+        {subscriptions.length > 0 && (
+          <button
+            className="clear-all-btn"
+            onClick={onUnsubscribeAll}
+            title="Clear all subscriptions"
+          >
+            Clear All
+          </button>
+        )}
+      </div>
       <div className="subscription-stats">
         <div className="stat active">
           <span className="stat-label">Active:</span>

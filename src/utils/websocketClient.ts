@@ -99,14 +99,19 @@ export class WebSocketClient {
       this.rawMessageHandler(message);
     }
 
+    console.log('WebSocketClient handling message:', message);
+
     if (message.type === 'subscription_update') {
       if (this.subscriptionUpdateHandler) {
         this.subscriptionUpdateHandler(message.payload as Subscription);
       }
     } else if (message.requestId && this.messageHandlers.has(message.requestId)) {
+      console.log('Found handler for requestId:', message.requestId);
       const handler = this.messageHandlers.get(message.requestId)!;
       handler(message.payload);
       this.messageHandlers.delete(message.requestId);
+    } else if (message.requestId) {
+      console.warn('No handler found for requestId:', message.requestId, 'Available handlers:', Array.from(this.messageHandlers.keys()));
     }
   }
 
@@ -136,6 +141,10 @@ export class WebSocketClient {
     return this.sendMessage('unsubscribe', { tagIds });
   }
 
+  unsubscribeAll(): Promise<unknown> {
+    return this.sendMessage('unsubscribe-all', {});
+  }
+
   private sendMessage(type: string, payload: unknown): Promise<unknown> {
     return new Promise((resolve, reject) => {
       // Choose WebSocket based on message type
@@ -153,10 +162,12 @@ export class WebSocketClient {
         requestId,
       };
 
+      // Use longer timeout for subscribe requests since they may take longer
+      const timeout = type === 'subscribe' ? 15000 : 5000;
       const timeoutId = setTimeout(() => {
         this.messageHandlers.delete(requestId);
         reject(new Error(`Request ${requestId} timed out`));
-      }, 5000);
+      }, timeout);
 
       this.messageHandlers.set(requestId, (data) => {
         clearTimeout(timeoutId);

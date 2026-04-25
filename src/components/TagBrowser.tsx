@@ -6,10 +6,11 @@ import './TagBrowser.css';
 interface TagBrowserProps {
   tags: OpcUaTag[];
   onSelectTags: (selectedTags: OpcUaTag[]) => void;
+  onRebrowse: () => void;
   isLoading: boolean;
 }
 
-export const TagBrowser: React.FC<TagBrowserProps> = ({ tags, onSelectTags, isLoading }) => {
+export const TagBrowser: React.FC<TagBrowserProps> = ({ tags, onSelectTags, onRebrowse, isLoading }) => {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
 
@@ -23,17 +24,41 @@ export const TagBrowser: React.FC<TagBrowserProps> = ({ tags, onSelectTags, isLo
     setExpandedNodes(newExpanded);
   };
 
-  const toggleTagSelection = (tag: OpcUaTag): void => {
-    // Only allow selection of leaf nodes (actual tags, not folders)
-    if (tag.isFolder) return;
-
+  // Get all descendant tag IDs recursively
+  const getAllDescendantIds = (tag: OpcUaTag): string[] => {
+    const ids: string[] = [];
     const identifier = tag.nodeId || tag.id;
-    const newSelected = new Set(selectedTags);
-    if (newSelected.has(identifier)) {
-      newSelected.delete(identifier);
-    } else {
-      newSelected.add(identifier);
+    
+    // Add the tag itself if it's a leaf node
+    if (!tag.isFolder) {
+      ids.push(identifier);
     }
+    
+    // Add all children recursively
+    if (tag.children) {
+      tag.children.forEach(child => {
+        ids.push(...getAllDescendantIds(child));
+      });
+    }
+    
+    return ids;
+  };
+
+  const toggleTagSelection = (tag: OpcUaTag): void => {
+    const newSelected = new Set(selectedTags);
+    const descendantIds = getAllDescendantIds(tag);
+    
+    // Check if this tag or any of its descendants are selected
+    const isCurrentlySelected = descendantIds.some(id => newSelected.has(id));
+    
+    if (isCurrentlySelected) {
+      // Deselect all descendants
+      descendantIds.forEach(id => newSelected.delete(id));
+    } else {
+      // Select all descendants
+      descendantIds.forEach(id => newSelected.add(id));
+    }
+    
     setSelectedTags(newSelected);
   };
 
@@ -79,9 +104,8 @@ export const TagBrowser: React.FC<TagBrowserProps> = ({ tags, onSelectTags, isLo
               <input
                 type="checkbox"
                 id={`tag-${tag.id}`}
-                checked={selectedTags.has(tag.nodeId || tag.id)}
+                checked={getAllDescendantIds(tag).some(id => selectedTags.has(id))}
                 onChange={() => toggleTagSelection(tag)}
-                disabled={tag.isFolder}
               />
               <label htmlFor={`tag-${tag.id}`} className="tag-label">
                 <span className="tag-name">{tag.name}</span>
@@ -102,7 +126,17 @@ export const TagBrowser: React.FC<TagBrowserProps> = ({ tags, onSelectTags, isLo
 
   return (
     <div className="tag-browser">
-      <h2>OPC UA Tag Browser</h2>
+      <div className="browser-header">
+        <h2>OPC UA Tag Browser</h2>
+        <button
+          className="rebrowse-btn"
+          onClick={onRebrowse}
+          disabled={isLoading}
+          title="Refresh tag browser"
+        >
+          🔄 Rebrowse
+        </button>
+      </div>
       {isLoading ? (
         <div className="loading">Loading tags...</div>
       ) : (

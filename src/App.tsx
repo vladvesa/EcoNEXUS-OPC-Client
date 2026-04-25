@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TagBrowser } from './components/TagBrowser';
 import { SubscriptionManager } from './components/SubscriptionManager';
-import { WebSocketDebug } from './components/WebSocketDebug';
 import { WebSocketClient } from './utils/websocketClient';
 import { parseTagsToTree } from './utils/tagParser';
 import { OpcUaTag, Subscription, RawTag } from './types/index';
@@ -17,18 +16,12 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [error, setError] = useState<string | null>(null);
-  const [lastMessage, setLastMessage] = useState<unknown>(null);
 
   useEffect(() => {
     const initializeConnection = async () => {
       try {
         await wsClient.connect();
         setConnectionStatus('connected');
-        
-        // Setup raw message handler for debugging
-        wsClient.onMessage((message) => {
-          setLastMessage(message);
-        });
         
         // Setup subscription update handler
         wsClient.onSubscriptionUpdate((subscription: Subscription) => {
@@ -80,6 +73,10 @@ function App() {
     }
   };
 
+  const handleRebrowse = async () => {
+    await loadTags();
+  };
+
   const handleSelectTags = async (selectedTags: OpcUaTag[]) => {
     // Filter to only leaf nodes (tags with nodeId)
     const leafTags = selectedTags.filter(tag => tag.nodeId && !tag.isFolder);
@@ -92,7 +89,11 @@ function App() {
 
     try {
       setError(null);
-      await wsClient.subscribe(nodeIds);
+      // Send subscribe request but don't fail if it times out - subscriptions will be confirmed via subscription_update
+      wsClient.subscribe(nodeIds).catch(err => {
+        console.warn('Subscribe request error:', err);
+        // Don't show error to user as subscription updates may still arrive
+      });
 
       // Add subscriptions locally
       const newSubscriptions: Subscription[] = leafTags.map(tag => ({
@@ -120,6 +121,20 @@ function App() {
       setSubscriptions(prev => prev.filter(s => s.tagId !== tagId));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to unsubscribe');
+    }
+  };
+
+  const handleUnsubscribeAll = async () => {
+    try {
+      setError(null);
+      console.log('Sending unsubscribe-all request...');
+      const response = await wsClient.unsubscribeAll();
+      console.log('Unsubscribe-all response:', response);
+      setSubscriptions([]);
+      console.log('Subscriptions cleared');
+    } catch (err) {
+      console.error('Unsubscribe-all error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to clear subscriptions');
     }
   };
 
@@ -167,10 +182,10 @@ function App() {
 
       <div className="app-container">
         <div className="browser-section">
-          <WebSocketDebug lastMessage={lastMessage} />
           <TagBrowser
             tags={tags}
             onSelectTags={handleSelectTags}
+            onRebrowse={handleRebrowse}
             isLoading={isLoading}
           />
         </div>
@@ -178,6 +193,7 @@ function App() {
           <SubscriptionManager
             subscriptions={subscriptions}
             onUnsubscribe={handleUnsubscribe}
+            onUnsubscribeAll={handleUnsubscribeAll}
           />
         </div>
       </div>
