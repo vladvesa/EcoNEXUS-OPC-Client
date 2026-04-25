@@ -1,0 +1,261 @@
+.mqtt-sparkplug-b {
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.mqtt-sparkplug-b h2 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #6f42c1;
+  padding-bottom: 10px;
+}
+
+.no-subscriptions-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: #999;
+  font-style: italic;
+}
+
+.mqtt-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 20px;
+}
+
+.mqtt-tree-section,
+.mqtt-config-section {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mqtt-tree-section h3,
+.mqtt-config-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 16px;
+}
+
+.mqtt-tree-container {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #fafafa;
+}
+
+.mqtt-tree {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mqtt-tree-item {
+  margin: 2px 0;
+}
+
+.mqtt-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  gap: 8px;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 12px;
+  color: #666;
+  min-width: 16px;
+}
+
+.expand-btn:hover {
+  color: #6f42c1;
+}
+
+.expand-placeholder {
+  display: inline-block;
+  width: 16px;
+}
+
+.mqtt-row input[type="checkbox"] {
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+.mqtt-label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.mqtt-label:hover {
+  background-color: #f0f0f0;
+}
+
+.mqtt-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.mqtt-type {
+  color: #999;
+  font-size: 12px;
+}
+
+.mqtt-children {
+  margin-top: 2px;
+}
+
+.config-group {
+  margin-bottom: 20px;
+}
+
+.config-group label {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.topic-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.topic-input:focus {
+  outline: none;
+  border-color: #6f42c1;
+  box-shadow: 0 0 0 2px rgba(111, 66, 193, 0.1);
+}
+
+.topic-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.topic-hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
+  margin-bottom: 0;
+  font-style: italic;
+}
+
+.selections-info {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 15px;
+}
+
+.selections-info p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.send-conversion-btn {
+  padding: 12px 20px;
+  background-color: #6f42c1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.send-conversion-btn:hover:not(:disabled) {
+  background-color: #5a32a3;
+}
+
+.send-conversion-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.selected-tags-summary {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.selected-tags-summary h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #333;
+  font-size: 14px;
+}
+
+.no-selected {
+  color: #999;
+  font-style: italic;
+  margin: 0;
+}
+
+.selected-tags-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.selected-tag-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background-color: #f0f0f0;
+  border-left: 3px solid #6f42c1;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.selected-tag-item .tag-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.selected-tag-item .tag-id {
+  color: #666;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 1200px) {
+  .mqtt-content {
+    grid-template-columns: 1fr;
+  }
+}
