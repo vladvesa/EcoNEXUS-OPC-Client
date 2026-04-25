@@ -17,7 +17,7 @@ export interface Subscription {
 }
 
 export interface WebSocketMessage {
-  type: 'browse' | 'subscribe' | 'unsubscribe' | 'unsubscribe-all' | 'browse_result' | 'subscription_update';
+  type: 'browse' | 'subscribe' | 'unsubscribe' | 'unsubscribe-all' | 'mqtt-sparkplug-b' | 'browse_result' | 'subscription_update';
   payload: unknown;
   requestId?: string;
 }
@@ -28,6 +28,11 @@ export interface BrowseRequest {
 
 export interface SubscribeRequest {
   tagIds: string[];
+}
+
+export interface MqttSparkplugBRequest {
+  selectedTagIds: string[];
+  topic: string;
 }
 
 export interface RawTag {

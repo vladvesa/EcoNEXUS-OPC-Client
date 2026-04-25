@@ -3,8 +3,10 @@ import { WebSocketMessage, BrowseRequest, SubscribeRequest, Subscription } from 
 export class WebSocketClient {
   private browseWs: WebSocket | null = null;
   private subscribeWs: WebSocket | null = null;
+  private conversionWs: WebSocket | null = null;
   private browseUrl: string;
   private subscribeUrl: string;
+  private conversionUrl: string;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 3000;
@@ -12,9 +14,10 @@ export class WebSocketClient {
   private subscriptionUpdateHandler: ((message: Subscription) => void) | null = null;
   private rawMessageHandler: ((message: WebSocketMessage) => void) | null = null;
 
-  constructor(urls: { browse: string; subscribe: string }) {
+  constructor(urls: { browse: string; subscribe: string; conversion: string }) {
     this.browseUrl = urls.browse;
     this.subscribeUrl = urls.subscribe;
+    this.conversionUrl = urls.conversion;
   }
 
   connect(): Promise<void> {
@@ -23,13 +26,15 @@ export class WebSocketClient {
         // Connect to browse WebSocket
         this.browseWs = new WebSocket(this.browseUrl);
         this.subscribeWs = new WebSocket(this.subscribeUrl);
+        this.conversionWs = new WebSocket(this.conversionUrl);
 
         let browseConnected = false;
         let subscribeConnected = false;
+        let conversionConnected = false;
 
         const checkConnections = () => {
-          if (browseConnected && subscribeConnected) {
-            console.log('Both WebSocket connections established');
+          if (browseConnected && subscribeConnected && conversionConnected) {
+            console.log('All WebSocket connections established');
             this.reconnectAttempts = 0;
             resolve();
           }
@@ -84,6 +89,32 @@ export class WebSocketClient {
 
         this.subscribeWs.onclose = () => {
           console.log('Subscribe WebSocket closed');
+          this.attemptReconnect();
+        };
+
+        // Conversion WebSocket setup
+        this.conversionWs.onopen = () => {
+          console.log('Conversion WebSocket connected');
+          conversionConnected = true;
+          checkConnections();
+        };
+
+        this.conversionWs.onmessage = (event) => {
+          try {
+            const message: WebSocketMessage = JSON.parse(event.data);
+            this.handleMessage(message);
+          } catch (error) {
+            console.error('Failed to parse conversion WebSocket message:', error);
+          }
+        };
+
+        this.conversionWs.onerror = (error) => {
+          console.error('Conversion WebSocket error:', error);
+          reject(error);
+        };
+
+        this.conversionWs.onclose = () => {
+          console.log('Conversion WebSocket closed');
           this.attemptReconnect();
         };
 
@@ -145,13 +176,28 @@ export class WebSocketClient {
     return this.sendMessage('unsubscribe-all', {});
   }
 
+  sendConversionRequest(selectedTagIds: string[], topic: string): Promise<unknown> {
+    return this.sendMessage('mqtt-sparkplug-b', { selectedTagIds, topic });
+  }
+
   private sendMessage(type: string, payload: unknown): Promise<unknown> {
     return new Promise((resolve, reject) => {
       // Choose WebSocket based on message type
-      const ws = (type === 'browse') ? this.browseWs : this.subscribeWs;
+      let ws: WebSocket | null = null;
+      if (type === 'browse') {
+        ws = this.browseWs;
+      } else if (type === 'mqtt-sparkplug-b') {
+        ws = this.conversionWs;
+      } else {
+        ws = this.subscribeWs;
+      }
 
       if (!ws || ws.readyState !== WebSocket.OPEN) {
-        reject(new Error(`${type === 'browse' ? 'Browse' : 'Subscribe'} WebSocket is not connected`));
+        let wsName = 'Unknown';
+        if (type === 'browse') wsName = 'Browse';
+        else if (type === 'mqtt-sparkplug-b') wsName = 'Conversion';
+        else wsName = 'Subscribe';
+        reject(new Error(`${wsName} WebSocket is not connected`));
         return;
       }
 
@@ -201,11 +247,16 @@ export class WebSocketClient {
       this.subscribeWs.close();
       this.subscribeWs = null;
     }
+    if (this.conversionWs) {
+      this.conversionWs.close();
+      this.conversionWs = null;
+    }
   }
 
   isConnected(): boolean {
     return (this.browseWs !== null && this.browseWs.readyState === WebSocket.OPEN) ||
-           (this.subscribeWs !== null && this.subscribeWs.readyState === WebSocket.OPEN);
+           (this.subscribeWs !== null && this.subscribeWs.readyState === WebSocket.OPEN) ||
+           (this.conversionWs !== null && this.conversionWs.readyState === WebSocket.OPEN);
   }
 
   private generateRequestId(): string {

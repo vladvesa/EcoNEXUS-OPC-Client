@@ -125,10 +125,46 @@ body {
   color: #604a1f;
 }
 
+.app-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 20px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-btn {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  color: #333;
+  background-color: #f0f0f0;
+}
+
+.tab-btn.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
 .app-container {
   display: flex;
   flex: 1;
   gap: 20px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.app-container-full {
+  flex: 1;
   padding: 20px;
   overflow: hidden;
 }

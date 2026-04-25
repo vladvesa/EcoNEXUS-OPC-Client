@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TagBrowser } from './components/TagBrowser';
 import { SubscriptionManager } from './components/SubscriptionManager';
+import { MqttSparkplugB } from './components/MqttSparkplugB';
 import { WebSocketClient } from './utils/websocketClient';
 import { parseTagsToTree } from './utils/tagParser';
 import { OpcUaTag, Subscription, RawTag } from './types/index';
@@ -9,13 +10,16 @@ import './App.css';
 function App() {
   const [wsClient] = useState(() => new WebSocketClient({
     browse: 'ws://localhost:1880/ws/tags',
-    subscribe: 'ws://localhost:1880/ws/tags/subscribe'
+    subscribe: 'ws://localhost:1880/ws/tags/subscribe',
+    conversion: 'ws://localhost:1880/ws/tags/conversion'
   }));
   const [tags, setTags] = useState<OpcUaTag[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'browser' | 'mqtt'>('browser');
+  const [isSendingConversion, setIsSendingConversion] = useState(false);
 
   useEffect(() => {
     const initializeConnection = async () => {
@@ -138,6 +142,24 @@ function App() {
     }
   };
 
+  const handleSendConversion = async (selectedTagIds: string[], topic: string) => {
+    try {
+      setError(null);
+      setIsSendingConversion(true);
+      console.log('Sending MQTT Sparkplug B conversion request...');
+      const response = await wsClient.sendConversionRequest(selectedTagIds, topic);
+      console.log('Conversion request response:', response);
+      setError(null);
+      // Show success message
+      alert(`Successfully sent ${selectedTagIds.length} tags to MQTT Sparkplug B conversion.`);
+    } catch (err) {
+      console.error('Conversion request error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to send conversion request');
+    } finally {
+      setIsSendingConversion(false);
+    }
+  };
+
   // Load test data for debugging
   const loadTestData = () => {
     const testTags: RawTag[] = [
@@ -180,23 +202,50 @@ function App() {
         </div>
       )}
 
-      <div className="app-container">
-        <div className="browser-section">
-          <TagBrowser
-            tags={tags}
-            onSelectTags={handleSelectTags}
-            onRebrowse={handleRebrowse}
-            isLoading={isLoading}
-          />
-        </div>
-        <div className="subscriptions-section">
-          <SubscriptionManager
-            subscriptions={subscriptions}
-            onUnsubscribe={handleUnsubscribe}
-            onUnsubscribeAll={handleUnsubscribeAll}
-          />
-        </div>
+      <div className="app-tabs">
+        <button
+          className={`tab-btn ${activeTab === 'browser' ? 'active' : ''}`}
+          onClick={() => setActiveTab('browser')}
+        >
+          Tag Browser & Subscriptions
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'mqtt' ? 'active' : ''}`}
+          onClick={() => setActiveTab('mqtt')}
+        >
+          MQTT Sparkplug B
+        </button>
       </div>
+
+      {activeTab === 'browser' && (
+        <div className="app-container">
+          <div className="browser-section">
+            <TagBrowser
+              tags={tags}
+              onSelectTags={handleSelectTags}
+              onRebrowse={handleRebrowse}
+              isLoading={isLoading}
+            />
+          </div>
+          <div className="subscriptions-section">
+            <SubscriptionManager
+              subscriptions={subscriptions}
+              onUnsubscribe={handleUnsubscribe}
+              onUnsubscribeAll={handleUnsubscribeAll}
+            />
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'mqtt' && (
+        <div className="app-container-full">
+          <MqttSparkplugB
+            subscriptions={subscriptions}
+            onSendConversion={handleSendConversion}
+            isLoading={isSendingConversion}
+          />
+        </div>
+      )}
     </div>
   );
 }
