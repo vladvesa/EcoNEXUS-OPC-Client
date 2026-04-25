@@ -134,7 +134,7 @@ export const TagBrowser: React.FC<TagBrowserProps> = ({ tags, onSelectTags, onRe
           disabled={isLoading}
           title="Refresh tag browser"
         >
-          🔄 Rebrowse
+          Rebrowse
         </button>
       </div>
       {isLoading ? (

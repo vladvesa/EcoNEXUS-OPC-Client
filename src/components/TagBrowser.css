@@ -25,7 +25,7 @@
 
 .rebrowse-btn {
   padding: 8px 16px;
-  background-color: #28a745;
+  background-color: #0066cc;
   color: white;
   border: none;
   border-radius: 4px;
@@ -37,7 +37,7 @@
 }
 
 .rebrowse-btn:hover:not(:disabled) {
-  background-color: #218838;
+  background-color: #0052a3;
 }
 
 .rebrowse-btn:disabled {
