@@ -1,0 +1,155 @@
+.tag-browser {
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tag-browser h2 {
+  margin-top: 0;
+  color: #333;
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 10px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-size: 16px;
+}
+
+.no-tags {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-style: italic;
+}
+
+.browser-container {
+  flex: 1;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 15px;
+}
+
+.tag-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tag-item {
+  margin: 2px 0;
+}
+
+.tag-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  gap: 8px;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  font-size: 12px;
+  color: #666;
+  min-width: 16px;
+}
+
+.expand-btn:hover {
+  color: #0066cc;
+}
+
+.expand-placeholder {
+  display: inline-block;
+  width: 16px;
+}
+
+.tag-row input[type="checkbox"] {
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+.tag-label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.tag-label:hover {
+  background-color: #f0f0f0;
+}
+
+.tag-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.tag-type {
+  color: #999;
+  font-size: 12px;
+}
+
+.tag-path {
+  color: #666;
+  font-size: 11px;
+  font-style: italic;
+  margin-left: 8px;
+}
+
+.tag-children {
+  margin-left: 20px;
+  border-left: 1px solid #ddd;
+  padding-left: 10px;
+  margin-top: 2px;
+}
+
+.selections-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.selections-summary p {
+  margin: 0;
+  color: #333;
+  font-weight: 500;
+}
+
+.submit-btn {
+  padding: 10px 20px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #0052a3;
+}
+
+.submit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

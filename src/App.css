@@ -1,0 +1,179 @@
+:root {
+  --primary-color: #0066cc;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --warning-color: #ffc107;
+  --dark-color: #343a40;
+  --light-color: #f8f9fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fafafa;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fafafa;
+}
+
+.app-header {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #004494 100%);
+  color: white;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.connected {
+  background-color: var(--success-color);
+}
+
+.status-indicator.connecting {
+  background-color: var(--warning-color);
+}
+
+.status-indicator.disconnected {
+  background-color: var(--error-color);
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.status-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.debug-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.debug-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.error-banner {
+  background-color: #fff3cd;
+  border-bottom: 2px solid var(--warning-color);
+  color: #856404;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-banner button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #856404;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.error-banner button:hover {
+  color: #604a1f;
+}
+
+.app-container {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.browser-section {
+  flex: 1.2;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.subscriptions-section {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .browser-section,
+  .subscriptions-section {
+    flex: 1;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .app-header h1 {
+    font-size: 18px;
+  }
+
+  .app-container {
+    padding: 10px;
+    gap: 10px;
+  }
+}
